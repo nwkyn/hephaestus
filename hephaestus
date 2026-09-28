@@ -40,3 +40,5 @@ case "$file" in
   wi/*) get "issues/${file#*/}"               | jq -r "$header" ;;
   *)    get "repository/files/${file//\//%2F}/raw?ref=HEAD" ;;
 esac
+
+# im not sure if very long diffs works, meh

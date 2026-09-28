@@ -1,3 +1,1 @@
-a minimal archlinux gitlab anubis bypass using JSON API
-never leaving the terminal. only needs jq and curl
-
+needs jq and curl
