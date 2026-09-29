@@ -17,7 +17,7 @@
 # project path can consist of top level groups and several subgroups.
 
 # here instead we query json, but the path guide above still applies
-BASE_URL="https://gitlab.archlinux.org/api/v4"
+BASE_URL="${BASE_URL:-https://gitlab.archlinux.org/api/v4}"
 # you could change this to any gitlab instance.
 
 # default to the packaging guidelines or specify a project and file path you'd like to consult.
@@ -26,19 +26,25 @@ BASE_URL="https://gitlab.archlinux.org/api/v4"
 project="${1:-archlinux/developer-manual}"
 file="${2:-content/package-guidelines/_index.md}"
 
+# accept pasted browser urls and trailing slashes
+project="${project#"${BASE_URL%/api/v4}"/}"
+project="${project%/}"
+
 # needed so that any curl error flows through, i.e 22 for 404
 set -o pipefail
 
 get() { curl -sSf "$BASE_URL/projects/${project//\//%2F}/$1"; }
 
-header='"# \(.title) [\(.state)] by \(.author.username)\n\n\(.description)"'
-diffs='.[] | "\n--- a/\(.old_path)\n+++ b/\(.new_path)\n\(.diff)"'
+header='"# \(.title) [\(.state)] by \(.author.username)\n\n\(.description // "")"'
+# gitlab blanks .diff past its size limits, say so instead of printing nothing
+diffs='.[] | "\n--- a/\(.old_path)\n+++ b/\(.new_path)\n\(if .too_large or .collapsed
+	then "(diff too large, see web ui)" else .diff end)"'
 
 case "$file" in
-  mr/*) get "merge_requests/${file#*/}"       | jq -r "$header"
+  mr/*) get "merge_requests/${file#*/}"       | jq -r "$header" &&
         get "merge_requests/${file#*/}/diffs?per_page=100" | jq -r "$diffs" ;;
   wi/*) get "issues/${file#*/}"               | jq -r "$header" ;;
   *)    get "repository/files/${file//\//%2F}/raw?ref=HEAD" ;;
 esac
 
-# im not sure if very long diffs works, meh
+# mr diffs cap at 100 files (single page), rest is not fetched
