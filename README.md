@@ -1,7 +1,4 @@
-<p align="center">
-	<img src=".a/volcano.svg" alt="Hephaestus">
-</p>
+<img align="left" src="./.a/volcano_d.svg#gh-light-mode-only" width="80" alt="hephaestus logo">
+<img align="left" src="./.a/volcano_l.svg#gh-dark-mode-only" width="80" alt="hephaestus logo">
 
----
-
-Needs `jq` and `curl`.
+# Hephaestus
