@@ -1,4 +1,4 @@
-# minimal git/git style test lib, ./run-tests from repo root runs all.
+# minimal git/git style test lib, ./tests-run from repo root runs all.
 # single file: cd .t && ./t0001-url.sh
 # gitlab.com by default so arch's instance is not rate limited.
 # fixtures are closed/merged items and tags, content should not move.
