@@ -37,7 +37,7 @@ get() { curl -sSf "$BASE_URL/projects/${project//\//%2F}/$1"; }
 
 header='"# \(.title) [\(.state)] by \(.author.username)\n\n\(.description // "")"'
 # gitlab blanks .diff past its size limits, say so instead of printing nothing
-diffs='.[] | "\n--- a/\(.old_path)\n+++ b/\(.new_path)\n\(if .too_large or .collapsed
+diffs='.[] | "\n--- a/\(.old_path)\n+++ b/\(.new_path)\n\(if .too_large
 	then "(diff too large, see web ui)" else .diff end)"'
 
 case "$file" in
