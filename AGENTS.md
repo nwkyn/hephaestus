@@ -130,3 +130,8 @@ Or single negation comparisons. Cf: "noise is weather; you can't ban the ocean. 
 Phrase structure that are just positional (negative or positive build-up, without substance).
 Do not hold actual depth, or going off subject when the subject is clear.
 Do not embellish things just to sound "nicer" or more "helpful assistant".
+
+## Skills
+
+For anything blocked by bot detection on gitlab, you are able to use JSON API endpoints (without thread comments, or auth)
+See `fetch` from repo's root for reference usage.
