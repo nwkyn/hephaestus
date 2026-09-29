@@ -51,6 +51,32 @@ test_expect_success 'empty or non-numeric id exits 2 without network' '
 	test_expect_code 2 fetch $P mr/1x
 '
 
+test_expect_success 'range without dots or empty side exits 2' '
+	export BASE_URL=http://127.0.0.1:9/api/v4 &&
+	test_expect_code 2 fetch $P cmp/main 2>err &&
+	grep -F "bad range: cmp/main" err &&
+	test_expect_code 2 fetch $P cmp/...v1.0.1 &&
+	test_expect_code 2 fetch $P cmp/v1.0.0... &&
+	test_expect_code 2 fetch $P cmp/..v1.0.1 &&
+	test_expect_code 2 fetch $P cmp/v1.0.0..
+'
+
+# reversed linear pair: merge base is TO itself, only ".." has a diff
+test_expect_success '"..." diffs from merge base, ".." straight' '
+	fetch $P cmp/v1.0.1...v1.0.0 >three &&
+	test "$(grep -c "^--- a/" three)" -eq 0 &&
+	fetch $P cmp/v1.0.1..v1.0.0 >two &&
+	test "$(grep -c "^--- a/" two)" -eq 17
+'
+
+test_expect_success 'compare url equals cmp/FROM...TO' '
+	fetch $P cmp/v1.0.0...v1.0.1 >expect &&
+	fetch "$U/-/compare/v1.0.0...v1.0.1?from_project_id=1" >actual &&
+	diff -u expect actual &&
+	IFS= read -r line <actual &&
+	test "$line" = "# v1.0.0...v1.0.1 [10 commits]"
+'
+
 test_expect_success 'trailing slash on short id tolerated' '
 	fetch $P mr/1 >expect &&
 	fetch $P mr/1/ >actual &&

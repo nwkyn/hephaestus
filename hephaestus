@@ -6,6 +6,8 @@
 # ./fetch pacman/pacman README
 # ./fetch pacman/pacman wi/334
 # ./fetch pacman/pacman mr/314
+# ./fetch pacman/pacman cmp/master...allan/splitpkg2
+# ./fetch pacman/pacman cmp/master..allan/splitpkg2
 # ./fetch archlinux/packaging/packages/coreutils wi/10
 # ./fetch https://gitlab.archlinux.org/pacman/pacman/-/merge_requests/314
 # REF=v7.0.0 ./fetch pacman/pacman README
@@ -44,6 +46,7 @@ case "$project" in
 	case "$tail" in
 	merge_requests/*)	file="mr/${id%%/*}" ;;
 	issues/*)		file="wi/${id%%/*}" ;;
+	compare/*)		file="cmp/$id" ;;
 	blob/*|raw/*)		ref="${id%%/*}" file="${id#*/}" ;;
 	*)	echo "unsupported url part: /-/$tail" >&2; exit 2 ;;
 	esac ;;
@@ -58,6 +61,21 @@ mr/*|wi/*)
 	''|*[!0-9]*)	echo "bad id: $file" >&2; exit 2 ;;
 	esac
 	file="${file%%/*}/$id" ;;
+# branch names may hold "/", only dots separate the two refs.
+# git semantics: "..." diffs from merge base, ".." diffs FROM against TO.
+# "a..." would otherwise match ".." with TO=".", reject it first.
+cmp/*)
+	r="${file#*/}"
+	straight=
+	case "$r" in
+	*...|...*)	;;
+	?*...?*)	from="${r%%...*}" to="${r#*...}" straight=false ;;
+	?*..?*)		from="${r%%..*}" to="${r#*..}" straight=true ;;
+	esac
+	if [ -z "$straight" ]; then
+		echo "bad range: $file, want cmp/FROM...TO or FROM..TO" >&2
+		exit 2
+	fi ;;
 esac
 
 # needed so that any curl error flows through, i.e 22 for 404
@@ -75,11 +93,17 @@ diffs='.[] | "\n--- a/\(.old_path)\n+++ b/\(.new_path)\n\(
 	if .too_large then "(diff too large, see web ui)"
 	elif .diff == "" then "(no text diff)"
 	else .diff end)"'
+cmp='"# \($r) [\(.commits | length) commits]\(
+	if .compare_timeout then " (timed out, partial)" else "" end)\n",
+	(.commits[] | "\(.short_id) \(.title)"),
+	(.diffs | '"$diffs"')'
 
 case "$file" in
 mr/*)	get "merge_requests/${file#*/}" | jq -r "$header" &&
 	get "merge_requests/${file#*/}/diffs?per_page=100" | jq -r "$diffs" ;;
 wi/*)	get "issues/${file#*/}" | jq -r "$header" ;;
+cmp/*)	q="from=$(enc "$from")&to=$(enc "$to")&straight=$straight"
+	get "repository/compare?$q" | jq -r --arg r "$r" "$cmp" ;;
 *)	get "repository/files/$(enc "$file")/raw?ref=$(enc "$ref")" ;;
 esac
 
