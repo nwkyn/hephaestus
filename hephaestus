@@ -7,6 +7,8 @@
 # ./fetch pacman/pacman wi/334
 # ./fetch pacman/pacman mr/314
 # ./fetch archlinux/packaging/packages/coreutils wi/10
+# ./fetch https://gitlab.archlinux.org/pacman/pacman/-/merge_requests/314
+# REF=v7.0.0 ./fetch pacman/pacman README
 
 # you can pipe this to "glow" for md formatting for instance
 # or whatever people do with markdown in terminals/editors
@@ -25,26 +27,49 @@ BASE_URL="${BASE_URL:-https://gitlab.archlinux.org/api/v4}"
 
 project="${1:-archlinux/developer-manual}"
 file="${2:-content/package-guidelines/_index.md}"
+ref="${REF:-HEAD}"
 
 # accept pasted browser urls and trailing slashes
 project="${project#"${BASE_URL%/api/v4}"/}"
+project="${project%%[?#]*}"
 project="${project%/}"
+
+# full browser urls: the part after "/-/" picks the resource, $2 is ignored.
+# blob refs containing "/" are ambiguous (gitlab ui has the same problem).
+case "$project" in
+*/-/*)
+	tail="${project#*/-/}"
+	project="${project%%/-/*}"
+	id="${tail#*/}"
+	case "$tail" in
+	merge_requests/*)	file="mr/${id%%/*}" ;;
+	issues/*)		file="wi/${id%%/*}" ;;
+	blob/*|raw/*)		ref="${id%%/*}" file="${id#*/}" ;;
+	*)	echo "unsupported url part: /-/$tail" >&2; exit 2 ;;
+	esac ;;
+esac
 
 # needed so that any curl error flows through, i.e 22 for 404
 set -o pipefail
 
-get() { curl -sSf "$BASE_URL/projects/${project//\//%2F}/$1"; }
+# full percent-encoding, "/" included, so any path/ref is a single segment
+enc() { jq -rn --arg s "$1" '$s|@uri'; }
+
+get() { curl -sSf "$BASE_URL/projects/$(enc "$project")/$1"; }
 
 header='"# \(.title) [\(.state)] by \(.author.username)\n\n\(.description // "")"'
-# gitlab blanks .diff past its size limits, say so instead of printing nothing
-diffs='.[] | "\n--- a/\(.old_path)\n+++ b/\(.new_path)\n\(if .too_large
-	then "(diff too large, see web ui)" else .diff end)"'
+# gitlab blanks .diff past its size limits, say so instead of printing nothing.
+# empty .diff otherwise means binary, pure rename or mode change.
+diffs='.[] | "\n--- a/\(.old_path)\n+++ b/\(.new_path)\n\(
+	if .too_large then "(diff too large, see web ui)"
+	elif .diff == "" then "(no text diff)"
+	else .diff end)"'
 
 case "$file" in
-  mr/*) get "merge_requests/${file#*/}"       | jq -r "$header" &&
-        get "merge_requests/${file#*/}/diffs?per_page=100" | jq -r "$diffs" ;;
-  wi/*) get "issues/${file#*/}"               | jq -r "$header" ;;
-  *)    get "repository/files/${file//\//%2F}/raw?ref=HEAD" ;;
+mr/*)	get "merge_requests/${file#*/}" | jq -r "$header" &&
+	get "merge_requests/${file#*/}/diffs?per_page=100" | jq -r "$diffs" ;;
+wi/*)	get "issues/${file#*/}" | jq -r "$header" ;;
+*)	get "repository/files/$(enc "$file")/raw?ref=$(enc "$ref")" ;;
 esac
 
 # mr diffs cap at 100 files (single page), rest is not fetched
