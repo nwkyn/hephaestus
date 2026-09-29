@@ -43,4 +43,18 @@ test_expect_success 'unsupported /-/ part exits 2 without network' '
 	grep -F "unsupported url part: /-/tree/main" err
 '
 
+test_expect_success 'empty or non-numeric id exits 2 without network' '
+	export BASE_URL=http://127.0.0.1:9/api/v4 &&
+	test_expect_code 2 fetch $P wi/ 2>err &&
+	grep -F "bad id: wi/" err &&
+	test_expect_code 2 fetch $P mr/abc &&
+	test_expect_code 2 fetch $P mr/1x
+'
+
+test_expect_success 'trailing slash on short id tolerated' '
+	fetch $P mr/1 >expect &&
+	fetch $P mr/1/ >actual &&
+	diff -u expect actual
+'
+
 test_done

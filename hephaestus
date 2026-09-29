@@ -49,6 +49,17 @@ case "$project" in
 	esac ;;
 esac
 
+# empty/non-numeric id hits the list endpoint, jq then fails on the array
+case "$file" in
+mr/*|wi/*)
+	id="${file#*/}"
+	id="${id%/}"
+	case "$id" in
+	''|*[!0-9]*)	echo "bad id: $file" >&2; exit 2 ;;
+	esac
+	file="${file%%/*}/$id" ;;
+esac
+
 # needed so that any curl error flows through, i.e 22 for 404
 set -o pipefail
 
