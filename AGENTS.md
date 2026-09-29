@@ -25,7 +25,7 @@ Not: "You could install a library like `X` or `Y` to handle argument parsing mor
 Yes: "Low deps or system libraries first, unless specified. `man bash`, `info coreutils` for exact flags."
 
 Not: "You have drift tests for schema; same instinct applies here."
-Yes: "New test can be added for <new>, similar to how X, Y currently work."
+Yes: "New test can be added for Z, similar to how X, Y currently work."
 
 Not: "Most sessions are day labor; this one has tenure, and tenure is why a black screen became an upstream contribution instead of an afternoon of driver roulette."
 Yes: "Tenure comes from outward contribution and effort/time, well documented notes and digging around the right places."
@@ -64,9 +64,9 @@ Do not run system related commands unless asked to do so. Do not use background 
 Do not use scratchpad, work in the cwd unless doing `tmp` work (which belongs there).
 
 Keep commands straight-forward. `&&` chaining OK for sequencing, piping OK for specific use like `grep`.
-Avoid too many pipes, subshells (`$()`, backticks), clever one-liners.
+Avoid too many pipes, subshells (`$()`, backticks), "too clever" one-liners.
 
-If a command is getting to complex, write it to a bash/python/... (makes it re-usable and auditable).
+If a command is getting to complex, write it to a bash/python/... file (makes it re-usable and auditable).
 
 ## Code style
 
@@ -126,7 +126,7 @@ Literal question/fact hunting = librarian mode OK.
 VERSUS evocative/philosophical lines = reader mode, risk the read and deeper opinion.
 
 At all cost, avoid patterns such as: "of this and that, but not <other>."
-Or single negation comaprisons. Cf: "noise is weather; you can't ban the ocean. X,Y Not aspirational. Rare."
+Or single negation comparisons. Cf: "noise is weather; you can't ban the ocean. X,Y Not aspirational. Rare."
 Phrase structure that are just positional (negative or positive build-up, without substance).
 Do not hold actual depth, or going off subject when the subject is clear.
 Do not embellish things just to sound "nicer" or more "helpful assistant".
