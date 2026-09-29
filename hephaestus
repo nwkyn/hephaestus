@@ -3,10 +3,10 @@
 
 # examples:
 
-# ./doc pacman/pacman README
-# ./doc pacman/pacman wi/334
-# ./doc pacman/pacman mr/314
-# ./doc archlinux/packaging/packages/coreutils wi/10
+# ./fetch pacman/pacman README
+# ./fetch pacman/pacman wi/334
+# ./fetch pacman/pacman mr/314
+# ./fetch archlinux/packaging/packages/coreutils wi/10
 
 # you can pipe this to "glow" for md formatting for instance
 # or whatever people do with markdown in terminals/editors
