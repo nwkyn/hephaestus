@@ -108,11 +108,14 @@ First line = the takeaway (brief/preview shows only line 1). Drop any `Why:` / `
 
 Example: Short subject, gotchas bellow.
 
-```fix(nsearch): cache garbage-collect entries
+```
+fix(nsearch): cache garbage-collect entries
 
 * create vecs.json ==> why
 * misc added to ignore ==> local only
+* ...
 ```
+Smaller scope commits are preferred, this both is likely to be accepted and is easier to revert/confirm later.
 After completing a task recommend a commit, do not ever push without being asked explictly.
 Do not suggest a task is finished if you are not sure it has properly been addressed.
 This usually involves looking into your own changes for nits/minimalism/edge-cases.
