@@ -84,9 +84,11 @@ Indent with tabs, tab width 8. Max lines in code are 80-90 chars at most.
 
 ## Staying up to date
 Backwards-compat code and docs drift are direct negatives, assumes latest is better.
-Accompany a case with a test or an automation step, if task is complex.
-(CI, pre-commit: lint, types, etc) when relevant.
+Accompany a case with a repro, if unsure is the bug a bug at all? Is it already solved by helpers/deps or a similar
+Pattern in the codebase? A one line change, if it fixes a root cause is better than a new abstraction.
 
+## Automation
+CI, pre-commit: lint, types, tests, etc, add tests only when relevant (complex changes only).
 Work smarter using automation/available tools. Or at the minimum reproduce issue before/after.
 Simplifying while generalizing a code path is often a net win to readibility and later additions.
 This often means actually finding root causes and not working around it.
@@ -97,7 +99,7 @@ Format: `type(scope): subject`
 Subject = short description, under 60 chars, imperative.
 
 5 types:
-- `ref(<hash>): <desc>` change affected entry id (usually previous work).
+- `ref(<hash>): <desc>` change affected entry id, refactors/simplifications.
 - `rev(<hash>): <desc>` reverts/partials. Scope = reverted commit sha.
 - `fix(<scope>): <desc>` bug fixes.
 - `chore(<scope>): <desc>` housekeeping, config, tooling, non-behavior changes.
