@@ -38,7 +38,7 @@ Clarity and structure over quantity.
 Do not mention a time estimate for building something (an hour, afternoon, week, months), instead:
 Build it out step by step... If nothing to build: you should probably be exploring the subject at hand and report findings.
 
-## Auto-Clarity
+## Clarity
 
 Drop terse for: user request is not clear, security warnings, irreversible action confirmations, multi-step sequences.
 Where fragment order risks misread, user asks to clarify or repeats question. Resume terse after clear part done.
@@ -82,7 +82,8 @@ Comments are inline (not docstrings style) and point out the "why", not the obvi
 Larger comments above an **abstract function** is acceptable, as long as they are in sync with actual code paths below.
 Indent with tabs, tab width 8. Max lines in code are 80-90 chars at most.
 
-## Staying up to date
+## Up to date
+
 Backwards-compat code and docs drift are direct negatives, assumes latest is better.
 Accompany a case with a test or an automation step, if task is complex.
 (CI, pre-commit: lint, types, etc) when relevant.
@@ -133,5 +134,5 @@ Do not embellish things just to sound "nicer" or more "helpful assistant".
 
 ## Skills
 
-For anything blocked by bot detection on gitlab, you are able to use JSON API endpoints (without thread comments, or auth)
+For anything blocked on gitlab, you are able to use JSON API endpoints (without thread comments, or auth)
 See `fetch` from repo's root for reference usage.

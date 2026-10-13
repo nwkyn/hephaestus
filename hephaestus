@@ -10,6 +10,11 @@
 # ./fetch pacman/pacman cmp/master..allan/splitpkg2
 # ./fetch archlinux/packaging/packages/coreutils wi/10
 # ./fetch https://gitlab.archlinux.org/pacman/pacman/-/merge_requests/314
+# ./fetch pacman/pacman 'wi?signature'
+# ./fetch pacman/pacman 'mr?makepkg lint'
+
+# ENV Knobs BASE_URL, REF
+
 # REF=v7.0.0 ./fetch pacman/pacman README
 
 # you can pipe this to "glow" for md formatting for instance
@@ -61,6 +66,13 @@ mr/*|wi/*)
 	''|*[!0-9]*)	echo "bad id: $file" >&2; exit 2 ;;
 	esac
 	file="${file%%/*}/$id" ;;
+# search title/description, all states, newest first
+mr\?*|wi\?*)
+	term="${file#*\?}"
+	if [ -z "$term" ]; then
+		echo "empty search: $file" >&2
+		exit 2
+	fi ;;
 # branch names may hold "/", only dots separate the two refs.
 # git semantics: "..." diffs from merge base, ".." diffs FROM against TO.
 # "a..." would otherwise match ".." with TO=".", reject it first.
@@ -93,12 +105,19 @@ diffs='.[] | "\n--- a/\(.old_path)\n+++ b/\(.new_path)\n\(
 	if .too_large then "(diff too large, see web ui)"
 	elif .diff == "" then "(no text diff)"
 	else .diff end)"'
+# lines are valid $2 for a follow-up fetch
+hits='.[] | "\($k)/\(.iid) [\(.state)] \(.title) by \(.author.username)"'
 cmp='"# \($r) [\(.commits | length) commits]\(
 	if .compare_timeout then " (timed out, partial)" else "" end)\n",
 	(.commits[] | "\(.short_id) \(.title)"),
 	(.diffs | '"$diffs"')'
 
 case "$file" in
+mr\?*|wi\?*)
+	k="${file%%\?*}"
+	q="search=$(enc "$term")&state=all&per_page=20"
+	[ "$k" = mr ] && ep=merge_requests || ep=issues
+	get "$ep?$q" | jq -r --arg k "$k" "$hits" ;;
 mr/*)	get "merge_requests/${file#*/}" | jq -r "$header" &&
 	get "merge_requests/${file#*/}/diffs?per_page=100" | jq -r "$diffs" ;;
 wi/*)	get "issues/${file#*/}" | jq -r "$header" ;;
