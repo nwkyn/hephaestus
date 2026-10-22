@@ -1,1 +1,6 @@
 .dev-**
+*.log
+__pycache__/
+
+worktrees/
+production/

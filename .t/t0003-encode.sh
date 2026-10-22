@@ -6,7 +6,7 @@
 # unencoded, "&" appends a second ref param that gitlab honors
 test_expect_success '"&" in REF does not inject extra params' '
 	P=gitlab-org/gitlab-runner &&
-	REF="HEAD&ref=v1.0.0" test_expect_code 22 fetch $P README.md
+	REF="HEAD&ref=v1.0.0" test_expect_code 22 gitlab-fetch.sh $P README.md
 '
 
 test_done

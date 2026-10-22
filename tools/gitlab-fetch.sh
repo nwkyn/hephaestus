@@ -3,19 +3,19 @@
 
 # examples:
 
-# ./fetch pacman/pacman README
-# ./fetch pacman/pacman wi/334
-# ./fetch pacman/pacman mr/314
-# ./fetch pacman/pacman cmp/master...allan/splitpkg2
-# ./fetch pacman/pacman cmp/master..allan/splitpkg2
-# ./fetch archlinux/packaging/packages/coreutils wi/10
-# ./fetch https://gitlab.archlinux.org/pacman/pacman/-/merge_requests/314
-# ./fetch pacman/pacman 'wi?signature'
-# ./fetch pacman/pacman 'mr?makepkg lint'
+# tools/gitlab-fetch.sh pacman/pacman README
+# tools/gitlab-fetch.sh pacman/pacman wi/334
+# tools/gitlab-fetch.sh pacman/pacman mr/314
+# tools/gitlab-fetch.sh pacman/pacman cmp/master...allan/splitpkg2
+# tools/gitlab-fetch.sh pacman/pacman cmp/master..allan/splitpkg2
+# tools/gitlab-fetch.sh archlinux/packaging/packages/coreutils wi/10
+# tools/gitlab-fetch.sh https://gitlab.archlinux.org/pacman/pacman/-/merge_requests/314
+# tools/gitlab-fetch.sh pacman/pacman 'wi?signature'
+# tools/gitlab-fetch.sh pacman/pacman 'mr?makepkg lint'
 
 # ENV Knobs BASE_URL, REF
 
-# REF=v7.0.0 ./fetch pacman/pacman README
+# REF=v7.0.0 tools/gitlab-fetch.sh pacman/pacman README
 
 # you can pipe this to "glow" for md formatting for instance
 # or whatever people do with markdown in terminals/editors

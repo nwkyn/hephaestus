@@ -6,23 +6,23 @@
 P=gitlab-org/gitlab-runner
 
 test_expect_success 'issue hit fetches as wi/N' '
-	fetch $P "wi?docker" >hits &&
+	gitlab-fetch.sh $P "wi?docker" >hits &&
 	test -s hits &&
 	IFS=" " read -r id rest <hits &&
 	case "$id" in wi/[0-9]*) ;; *) false ;; esac &&
-	fetch $P "$id" >out &&
+	gitlab-fetch.sh $P "$id" >out &&
 	test -s out
 '
 
 test_expect_success 'mr hits prefixed mr/' '
-	fetch $P "mr?docker" >hits &&
+	gitlab-fetch.sh $P "mr?docker" >hits &&
 	test -s hits &&
 	! grep -v "^mr/[0-9]" hits
 '
 
 test_expect_success 'empty search exits 2 without network' '
 	export BASE_URL=http://127.0.0.1:9/api/v4 &&
-	test_expect_code 2 fetch $P "wi?" 2>err &&
+	test_expect_code 2 gitlab-fetch.sh $P "wi?" 2>err &&
 	grep -F "empty search: wi?" err
 '
 
