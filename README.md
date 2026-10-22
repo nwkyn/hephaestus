@@ -6,4 +6,4 @@
 
 Needs `jq` and `curl`.
 
-> Utility to work/research with LLMs on GitLab instances from the terminal.
+> Utility to work/research with LLMs.
