@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # mediawiki fetcher: url forms, search, error codes.
-# en.wikipedia.org so arch's wiki is not rate limited. live content, so
-# every form is compared against one fetch, search checked by shape.
+# live content, so every form is compared against one fetch,
+# search checked by shape.
 
 . ./test-lib.sh
 

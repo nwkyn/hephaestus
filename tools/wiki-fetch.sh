@@ -4,21 +4,20 @@
 # examples:
 
 # tools/wiki-fetch.sh
-# tools/wiki-fetch.sh wiki.archlinux.org 'Pacman/Tips and tricks'
-# tools/wiki-fetch.sh wiki.archlinux.org '?pacman hooks'
-# tools/wiki-fetch.sh en.wikipedia.org Unix
-# tools/wiki-fetch.sh https://wiki.gentoo.org/wiki/Portage
+# tools/wiki-fetch.sh en.wikipedia.org 'Unix philosophy'
+# tools/wiki-fetch.sh en.wikipedia.org '?unix shell'
+# tools/wiki-fetch.sh https://en.wikipedia.org/wiki/Unix
 # tools/wiki-fetch.sh 'https://en.wikipedia.org/w/index.php?title=Unix&oldid=1'
 
 # ENV Knobs API (skips api.php discovery, $1 then only matters for urls)
 
-# API=https://wiki.archlinux.org/api.php tools/wiki-fetch.sh - Pacman
+# API=https://en.wikipedia.org/w/api.php tools/wiki-fetch.sh - Unix
 
-# https://wiki.archlinux.org /title/Pacman
-# └── wiki (host[/path]) ──┘ └─ article path, from siteinfo ─┘
+# https://en.wikipedia.org /wiki/Unix
+# └─ wiki (host[/path]) ─┘ └─ article path, from siteinfo ─┘
 
-wiki="${1:-wiki.archlinux.org}"
-page="${2:-Installation guide}"
+wiki="${1:-en.wikipedia.org}"
+page="${2:-Unix}"
 
 # full browser urls: the path after the host picks the page, $2 is ignored.
 path=

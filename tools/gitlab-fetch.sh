@@ -3,37 +3,38 @@
 
 # examples:
 
-# tools/gitlab-fetch.sh pacman/pacman README
-# tools/gitlab-fetch.sh pacman/pacman wi/334
-# tools/gitlab-fetch.sh pacman/pacman mr/314
-# tools/gitlab-fetch.sh pacman/pacman cmp/master...allan/splitpkg2
-# tools/gitlab-fetch.sh pacman/pacman cmp/master..allan/splitpkg2
-# tools/gitlab-fetch.sh archlinux/packaging/packages/coreutils wi/10
-# tools/gitlab-fetch.sh https://gitlab.archlinux.org/pacman/pacman/-/merge_requests/314
-# tools/gitlab-fetch.sh pacman/pacman 'wi?signature'
-# tools/gitlab-fetch.sh pacman/pacman 'mr?makepkg lint'
+# tools/gitlab-fetch.sh gitlab-org/gitlab-runner README.md
+# tools/gitlab-fetch.sh gitlab-org/gitlab-runner wi/1
+# tools/gitlab-fetch.sh gitlab-org/gitlab-runner mr/1
+# tools/gitlab-fetch.sh gitlab-org/gitlab-runner cmp/v1.0.0...v1.0.1
+# tools/gitlab-fetch.sh gitlab-org/gitlab-runner cmp/v1.0.0..v1.0.1
+# tools/gitlab-fetch.sh gitlab-org/api/client-go README.md
+# tools/gitlab-fetch.sh https://gitlab.com/gitlab-org/gitlab-runner/-/merge_requests/1
+# tools/gitlab-fetch.sh gitlab-org/gitlab-runner 'wi?docker'
+# tools/gitlab-fetch.sh gitlab-org/gitlab-runner 'mr?docker runner'
 
 # ENV Knobs BASE_URL, REF
 
-# REF=v7.0.0 tools/gitlab-fetch.sh pacman/pacman README
+# BASE_URL=https://gitlab.example.org/api/v4 tools/gitlab-fetch.sh group/project wi/1
+# REF=v1.0.0 tools/gitlab-fetch.sh gitlab-org/gitlab-runner README.md
 
 # you can pipe this to "glow" for md formatting for instance
 # or whatever people do with markdown in terminals/editors
 
-# https://gitlab.archlinux.org / archlinux/packaging/packages/linux/
-#        └── url server ───────┘   └──────── project path ─────────┘
+# https://gitlab.com / gitlab-org/gitlab-runner/
+# └── url server ──┘   └── project path ───────┘
 
 # project path can consist of top level groups and several subgroups.
 
 # here instead we query json, but the path guide above still applies
-BASE_URL="${BASE_URL:-https://gitlab.archlinux.org/api/v4}"
+BASE_URL="${BASE_URL:-https://gitlab.com/api/v4}"
 # you could change this to any gitlab instance.
 
-# default to the packaging guidelines or specify a project and file path you'd like to consult.
-# plain paths: "/" is escaped to "%2F" below. this bypasses all anubis related blocks.
+# default to the runner readme or specify a project and file path to consult.
+# plain paths: "/" is escaped to "%2F" below. the api skips web-ui bot checks.
 
-project="${1:-archlinux/developer-manual}"
-file="${2:-content/package-guidelines/_index.md}"
+project="${1:-gitlab-org/gitlab-runner}"
+file="${2:-README.md}"
 ref="${REF:-HEAD}"
 
 # accept pasted browser urls and trailing slashes
