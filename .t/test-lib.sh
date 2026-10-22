@@ -8,7 +8,7 @@ TRASH="$PWD/trash directory.${TEST_NAME%.sh}"
 
 export BASE_URL="${TEST_BASE_URL:-https://gitlab.com/api/v4}"
 WEB_URL="${BASE_URL%/api/v4}"
-unset REF
+unset REF API
 PATH="$PWD/../tools:$PATH"
 
 test_count=0
