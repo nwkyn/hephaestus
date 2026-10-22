@@ -1,17 +1,14 @@
 #!/usr/bin/env bash
-# fetch, for any mediawiki: raw wikitext, search, history, revision diffs.
+# fetch, for any mediawiki: latest raw wikitext, search.
 
 # examples:
 
 # tools/wiki-fetch.sh
 # tools/wiki-fetch.sh wiki.archlinux.org 'Pacman/Tips and tricks'
 # tools/wiki-fetch.sh wiki.archlinux.org '?pacman hooks'
-# tools/wiki-fetch.sh wiki.archlinux.org hist/Pacman
-# tools/wiki-fetch.sh wiki.archlinux.org rev/884369
-# tools/wiki-fetch.sh wiki.archlinux.org old/884369
 # tools/wiki-fetch.sh en.wikipedia.org Unix
 # tools/wiki-fetch.sh https://wiki.gentoo.org/wiki/Portage
-# tools/wiki-fetch.sh 'https://en.wikipedia.org/w/index.php?title=Unix&diff=1&oldid=2'
+# tools/wiki-fetch.sh 'https://en.wikipedia.org/w/index.php?title=Unix&oldid=1'
 
 # ENV Knobs API (skips api.php discovery, $1 then only matters for urls)
 
@@ -61,30 +58,21 @@ if [ -z "$ap" ]; then
 	exit 2
 fi
 
-# "%xx" and "+" decoding, enough for titles and ids
+# "%xx" and "+" decoding, enough for titles
 dec() { v="${1//+/ }"; printf '%b' "${v//%/\\x}"; }
 
-# query param $1 from "?a=b&c=d", empty if absent
-param() {
-	q="&${path#*\?}&"
-	v="${q#*&"$1"=}"
-	[ "$v" != "$q" ] && dec "${v%%&*}"
-}
-
+# query urls: only title= matters, oldid/diff links give the latest content
 if [ -n "$path" ]; then
 	path="${path%%#*}"
 	case "$path" in
 	*\?*)
-		if d=$(param diff) && [ "$d" != prev ]; then
-			page="rev/$d"
-		elif d=$(param oldid); then
-			page="old/$d"
-		elif d=$(param title); then
-			page="$d"
-		else
+		q="&${path#*\?}&"
+		t="${q#*&title=}"
+		if [ "$t" = "$q" ]; then
 			echo "unsupported url: $path" >&2
 			exit 2
-		fi ;;
+		fi
+		page=$(dec "${t%%&*}") ;;
 	"${ap%\$1}"*)
 		page=$(dec "${path#"${ap%\$1}"}") ;;
 	*)	echo "path outside article path ${ap%\$1}: $path" >&2
@@ -92,48 +80,17 @@ if [ -n "$path" ]; then
 	esac
 fi
 
-case "$page" in
-rev/*|old/*)
-	id="${page#*/}"
-	case "$id" in
-	''|*[!0-9]*)	echo "bad id: $page" >&2; exit 2 ;;
-	esac ;;
-\?*)
-	if [ "$page" = '?' ]; then
-		echo "empty search: $page" >&2
-		exit 2
-	fi ;;
-esac
+if [ "$page" = '?' ]; then
+	echo "empty search: $page" >&2
+	exit 2
+fi
 
-revs='.query.pages[0] |
-	if .missing then error("missing: \(.title)") else .revisions end'
+case "$page" in
 # lines are valid $2 for a follow-up fetch
-hist='.[] | "rev/\(.revid) \(.timestamp[:10]) \(.user // "?"): \(
-	.comment // "")"'
-
-# revision content, revid 0 (page creation parent) is empty
-old() {
-	[ "$1" = 0 ] && return
-	get '(.query.pages // error("bad revision")) |
-		.[0].revisions[0].slots.main.content' \
-		-d action=query -d prop=revisions -d rvprop=content \
-		-d rvslots=main -d "revids=$1"
-}
-
-case "$page" in
 \?*)	get '.query.search[].title' -d action=query -d list=search \
 		-d srlimit=20 --data-urlencode "srsearch=${page#\?}" ;;
-hist/*)	get "$revs | $hist" -d action=query -d prop=revisions \
-		-d 'rvprop=ids|timestamp|user|comment' -d rvlimit=20 \
-		-d redirects=1 --data-urlencode "titles=${page#*/}" ;;
-old/*)	old "$id" ;;
-# diff exits 1 on changes, only 2+ is a failure
-rev/*)	p=$(get '(.query.pages // error("bad revision")) |
-		.[0].revisions[0].parentid' -d action=query \
-		-d prop=revisions -d rvprop=ids -d "revids=$id") || exit
-	diff -u --label "old/$p" --label "old/$id" <(old "$p") <(old "$id")
-	[ $? -lt 2 ] ;;
-*)	get "$revs | .[0].slots.main.content" -d action=query \
-		-d prop=revisions -d rvprop=content -d rvslots=main \
-		-d redirects=1 --data-urlencode "titles=$page" ;;
+*)	get '.query.pages[0] | if .missing then error("missing: \(.title)")
+		else .revisions[0].slots.main.content end' \
+		-d action=query -d prop=revisions -d rvprop=content \
+		-d rvslots=main -d redirects=1 --data-urlencode "titles=$page" ;;
 esac
